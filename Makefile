@@ -369,6 +369,27 @@ else ifneq (,$(findstring vita,$(platform)))
 
    PLATFORM_EXT := unix
    STATIC_LINKING=1
+   
+# Nintendo Switch (libnx)
+else ifeq ($(platform), switch)
+include $(DEVKITPRO)/libnx/switch_rules
+    EXT=a
+    HAVE_NEON = 0
+    DYNAREC_USED = 0
+    GLES = 1
+    HAVE_OPENGL = 0
+    HAVE_PARALLEL=0
+    TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
+    DEFINES := -DSWITCH=1 -U__linux__ -U__linux -DRARCH_INTERNAL
+    CFLAGS	:=	 $(DEFINES) -g \
+                -O2 \
+				-fPIE -I$(LIBNX)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec -Wl,--allow-multiple-definition -specs=$(LIBNX)/switch.specs
+    CFLAGS += $(INCDIRS)
+    CFLAGS	+=	$(INCLUDE)  -D__SWITCH__
+    CXXFLAGS := $(ASFLAGS) $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
+    CFLAGS += -std=gnu11
+    PLATFORM_EXT := unix
+STATIC_LINKING = 1
 
 # Windows MSVC 2017 all architectures
 else ifneq (,$(findstring windows_msvc2017,$(platform)))
